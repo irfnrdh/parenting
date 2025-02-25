@@ -5,80 +5,369 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulasi Tabungan Pendidikan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-xl font-bold mb-4">Simulasi Tabungan Pendidikan</h2>
-        <form id="simulasiForm" class="space-y-4">
-            <div>
-                <label class="block font-medium">Usia Anak Saat Ini (Tahun)</label>
-                <input type="number" id="usiaAnak" class="w-full p-2 border rounded" value="4" min="1" required>
+<body class="bg-gray-100 p-4 md:p-6">
+    <div class="max-w-4xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-2 text-blue-700">Simulasi Tabungan Pendidikan</h1>
+        
+        <!-- Deskripsi Singkat -->
+        <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p class="text-sm md:text-base">
+                Simulasi ini membantu Anda merencanakan tabungan pendidikan anak dalam bentuk emas, dari preschool hingga S3.
+                Hasil kalkulasi akan menunjukkan proyeksi biaya per jenjang dan jumlah emas yang perlu ditabung per bulan.
+            </p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Form Input -->
+            <div class="w-full md:w-1/2">
+                <h2 class="text-lg font-semibold mb-4 pb-2 border-b">Data Simulasi</h2>
+                <form id="simulasiForm" class="space-y-4">
+                    <div>
+                        <label for="usiaAnak" class="block font-medium">
+                            Usia Anak Saat Ini (Tahun)
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Usia anak dalam tahun saat ini">ⓘ</span>
+                        </label>
+                        <input type="number" id="usiaAnak" class="w-full p-2 border rounded" value="4" min="0" max="20" required>
+                        <div id="usiaAnak-error" class="text-red-500 text-sm hidden">Masukkan usia antara 0-20 tahun</div>
+                    </div>
+                    
+                    <div>
+                        <label for="tahunSekarang" class="block font-medium">
+                            Tahun Sekarang
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Tahun saat ini untuk basis perhitungan">ⓘ</span>
+                        </label>
+                        <input type="number" id="tahunSekarang" class="w-full p-2 border rounded" value="2025" min="2025" required>
+                    </div>
+                    
+                    <div>
+                        <label for="hargaEmas" class="block font-medium">
+                            Harga Emas Saat Ini (IDR/gram)
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Harga emas per gram dalam Rupiah saat ini">ⓘ</span>
+                        </label>
+                        <input type="number" id="hargaEmas" class="w-full p-2 border rounded" value="1200000" min="100000" required>
+                    </div>
+                    
+                    <div class="border p-3 rounded-lg bg-gray-50">
+                        <label class="block font-medium mb-2">
+                            Biaya Pendidikan Saat Ini per Jenjang (IDR)
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Estimasi biaya per jenjang pendidikan saat ini">ⓘ</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="biayaPreschool" class="text-sm">Preschool</label>
+                                <input type="number" id="biayaPreschool" class="w-full p-2 border rounded" value="15000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaTK" class="text-sm">TK</label>
+                                <input type="number" id="biayaTK" class="w-full p-2 border rounded" value="20000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaSD" class="text-sm">SD</label>
+                                <input type="number" id="biayaSD" class="w-full p-2 border rounded" value="30000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaSMP" class="text-sm">SMP</label>
+                                <input type="number" id="biayaSMP" class="w-full p-2 border rounded" value="40000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaSMA" class="text-sm">SMA</label>
+                                <input type="number" id="biayaSMA" class="w-full p-2 border rounded" value="50000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaS1" class="text-sm">S1</label>
+                                <input type="number" id="biayaS1" class="w-full p-2 border rounded" value="80000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaS2" class="text-sm">S2</label>
+                                <input type="number" id="biayaS2" class="w-full p-2 border rounded" value="100000000" required>
+                            </div>
+                            <div>
+                                <label for="biayaS3" class="text-sm">S3</label>
+                                <input type="number" id="biayaS3" class="w-full p-2 border rounded" value="150000000" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="inflasiPendidikan" class="block font-medium">
+                            Inflasi Pendidikan per Tahun (%)
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Perkiraan kenaikan biaya pendidikan per tahun">ⓘ</span>
+                        </label>
+                        <input type="number" id="inflasiPendidikan" class="w-full p-2 border rounded" value="10" min="1" max="20" step="0.1" required>
+                    </div>
+                    
+                    <div>
+                        <label for="kenaikanEmas" class="block font-medium">
+                            Kenaikan Harga Emas per Tahun (%)
+                            <span class="text-gray-500 text-sm ml-1 cursor-help" title="Perkiraan kenaikan harga emas per tahun">ⓘ</span>
+                        </label>
+                        <input type="number" id="kenaikanEmas" class="w-full p-2 border rounded" value="10" min="1" max="20" step="0.1" required>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="button" id="hitungButton" onclick="hitungSimulasi()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors">
+                            Hitung Simulasi
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label class="block font-medium">Tahun Sekarang</label>
-                <input type="number" id="tahunSekarang" class="w-full p-2 border rounded" value="2025" required>
+            
+            <!-- Hasil Simulasi -->
+            <div class="w-full md:w-1/2" id="hasilContainer">
+                <h2 class="text-lg font-semibold mb-4 pb-2 border-b">Hasil Simulasi</h2>
+                <div id="noResults" class="py-8 text-center text-gray-500">
+                    Silahkan isi data simulasi dan klik tombol "Hitung Simulasi"
+                </div>
+                <div id="loadingResults" class="py-8 text-center hidden">
+                    <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="mt-2 text-gray-600">Menghitung simulasi...</p>
+                </div>
+                <div id="hasil" class="hidden"></div>
+                
+                <!-- Tombol Aksi -->
+                <div id="resultActions" class="mt-4 flex gap-2 hidden">
+                    <button onclick="printResults()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg flex items-center justify-center gap-1 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Cetak
+                    </button>
+                    <button onclick="downloadPDF()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg flex items-center justify-center gap-1 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Simpan PDF
+                    </button>
+                </div>
             </div>
-            <div>
-                <label class="block font-medium">Harga Emas Saat Ini (IDR/gram)</label>
-                <input type="number" id="hargaEmas" class="w-full p-2 border rounded" value="1200000" required>
-            </div>
-            <div>
-                <label class="block font-medium">Biaya Pendidikan Saat Ini per Jenjang (IDR)</label>
-                <input type="text" id="biayaPendidikan" class="w-full p-2 border rounded" value="15000000,20000000,30000000,40000000,50000000,80000000,100000000,150000000" required>
-                <small class="text-gray-500">Masukkan biaya untuk Preschool, TK, SD, SMP, SMA, S1, S2, S3 (pisahkan dengan koma).</small>
-            </div>
-            <div>
-                <label class="block font-medium">Inflasi Pendidikan per Tahun (%)</label>
-                <input type="number" id="inflasiPendidikan" class="w-full p-2 border rounded" value="10" step="0.1" required>
-            </div>
-            <div>
-                <button type="button" onclick="hitungSimulasi()" class="w-full bg-blue-500 text-white py-2 rounded">Hitung</button>
-            </div>
-        </form>
-        <div id="hasil" class="mt-6"></div>
+        </div>
     </div>
 
     <script>
-        function hitungSimulasi() {
-            const usiaAnak = parseInt(document.getElementById("usiaAnak").value);
-            const tahunSekarang = parseInt(document.getElementById("tahunSekarang").value);
-            const hargaEmasSekarang = parseFloat(document.getElementById("hargaEmas").value);
-            const biayaPendidikanInput = document.getElementById("biayaPendidikan").value;
-            const inflasiPendidikan = parseFloat(document.getElementById("inflasiPendidikan").value) / 100;
-            const biayaSekarang = biayaPendidikanInput.split(",").map(Number);
-            
-            const jenjang = ["Preschool", "TK", "SD", "SMP", "SMA", "S1", "S2", "S3"];
-            const usiaMasuk = [4.5, 7, 9, 15, 18, 21, 24, 28];
-            const kenaikanEmas = 0.10;
-            
-            let hasilHTML = `<h3 class='text-lg font-bold mb-2'>Hasil Simulasi</h3>`;
-            hasilHTML += `<table class='w-full border-collapse border border-gray-300'>`;
-            hasilHTML += `<tr class='bg-gray-200'><th class='border p-2'>Jenjang</th><th class='border p-2'>Tahun Masuk</th><th class='border p-2'>Biaya Saat Ini (IDR)</th><th class='border p-2'>Biaya di Masa Depan (IDR)</th></tr>`;
-            
-            let totalBiaya = 0;
-            let tahunMasukAkhir = 0;
-            
-            for (let i = 0; i < jenjang.length; i++) {
-                let tahunMasuk = tahunSekarang + (usiaMasuk[i] - usiaAnak);
-                let biayaProyeksi = biayaSekarang[i] * Math.pow(1 + inflasiPendidikan, tahunMasuk - tahunSekarang);
-                totalBiaya += biayaProyeksi;
-                tahunMasukAkhir = Math.max(tahunMasukAkhir, tahunMasuk);
-                
-                hasilHTML += `<tr><td class='border p-2'>${jenjang[i]}</td><td class='border p-2'>${tahunMasuk}</td><td class='border p-2'>Rp ${biayaSekarang[i].toLocaleString()}</td><td class='border p-2'>Rp ${biayaProyeksi.toLocaleString()}</td></tr>`;
+        // Validasi input
+        document.getElementById("usiaAnak").addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const errorElem = document.getElementById("usiaAnak-error");
+            if (value < 0 || value > 20) {
+                errorElem.classList.remove("hidden");
+                this.classList.add("border-red-500");
+            } else {
+                errorElem.classList.add("hidden");
+                this.classList.remove("border-red-500");
             }
-            hasilHTML += `</table>`;
+        });
+
+        let biayaChart = null;
+        
+        function hitungSimulasi() {
+            // Tampilkan loading
+            document.getElementById("noResults").classList.add("hidden");
+            document.getElementById("hasil").classList.add("hidden");
+            document.getElementById("resultActions").classList.add("hidden");
+            document.getElementById("loadingResults").classList.remove("hidden");
             
-            let hargaEmasMasaDepan = hargaEmasSekarang * Math.pow(1 + kenaikanEmas, tahunMasukAkhir - tahunSekarang);
-            let totalGramEmas = totalBiaya / hargaEmasMasaDepan;
-            let tabunganPerBulan = totalGramEmas / ((tahunMasukAkhir - tahunSekarang) * 12);
+            // Tunda kalkulasi untuk menampilkan loading state
+            setTimeout(function() {
+                // Ambil semua input
+                const usiaAnak = parseInt(document.getElementById("usiaAnak").value);
+                const tahunSekarang = parseInt(document.getElementById("tahunSekarang").value);
+                const hargaEmasSekarang = parseFloat(document.getElementById("hargaEmas").value);
+                const inflasiPendidikan = parseFloat(document.getElementById("inflasiPendidikan").value) / 100;
+                const kenaikanEmas = parseFloat(document.getElementById("kenaikanEmas").value) / 100;
+                
+                // Ambil biaya pendidikan
+                const biayaSekarang = [
+                    parseFloat(document.getElementById("biayaPreschool").value),
+                    parseFloat(document.getElementById("biayaTK").value),
+                    parseFloat(document.getElementById("biayaSD").value),
+                    parseFloat(document.getElementById("biayaSMP").value),
+                    parseFloat(document.getElementById("biayaSMA").value),
+                    parseFloat(document.getElementById("biayaS1").value),
+                    parseFloat(document.getElementById("biayaS2").value),
+                    parseFloat(document.getElementById("biayaS3").value)
+                ];
+                
+                const jenjang = ["Preschool", "TK", "SD", "SMP", "SMA", "S1", "S2", "S3"];
+                const usiaMasuk = [4.5, 6, 7, 13, 16, 19, 23, 26]; // Usia masuk tiap jenjang
+                
+                let hasilHTML = `<div class="overflow-x-auto mb-6">`;
+                hasilHTML += `<table class="min-w-full border-collapse border border-gray-300 text-sm">`;
+                hasilHTML += `<thead>
+                                <tr class="bg-blue-100">
+                                    <th class="border p-2 text-left">Jenjang</th>
+                                    <th class="border p-2 text-center">Tahun Masuk</th>
+                                    <th class="border p-2 text-right">Biaya Saat Ini</th>
+                                    <th class="border p-2 text-right">Biaya Masa Depan</th>
+                                </tr>
+                              </thead>
+                              <tbody>`;
+                
+                let totalBiaya = 0;
+                let tahunMasukAkhir = 0;
+                let biayaProyeksiList = [];
+                let tahunMasukList = [];
+                
+                for (let i = 0; i < jenjang.length; i++) {
+                    let tahunMasuk = tahunSekarang + Math.max(0, Math.round(usiaMasuk[i] - usiaAnak));
+                    let tahunSelisih = tahunMasuk - tahunSekarang;
+                    let biayaProyeksi = biayaSekarang[i] * Math.pow(1 + inflasiPendidikan, tahunSelisih);
+                    
+                    totalBiaya += biayaProyeksi;
+                    tahunMasukAkhir = Math.max(tahunMasukAkhir, tahunMasuk);
+                    tahunMasukList.push(tahunMasuk);
+                    biayaProyeksiList.push(biayaProyeksi);
+                    
+                    hasilHTML += `<tr class="hover:bg-gray-50">
+                                    <td class="border p-2">${jenjang[i]}</td>
+                                    <td class="border p-2 text-center">${tahunMasuk}</td>
+                                    <td class="border p-2 text-right">Rp ${biayaSekarang[i].toLocaleString('id-ID')}</td>
+                                    <td class="border p-2 text-right font-medium ${biayaProyeksi > biayaSekarang[i] * 2 ? 'text-orange-600' : ''}">
+                                        Rp ${biayaProyeksi.toLocaleString('id-ID')}
+                                    </td>
+                                  </tr>`;
+                }
+                
+                hasilHTML += `<tr class="bg-blue-50 font-semibold">
+                                <td colspan="3" class="border p-2 text-right">Total Biaya Pendidikan:</td>
+                                <td class="border p-2 text-right">Rp ${totalBiaya.toLocaleString('id-ID')}</td>
+                              </tr>`;
+                hasilHTML += `</tbody></table>`;
+                hasilHTML += `</div>`;
+                
+                // Hitung tabungan emas
+                const tahunTotal = tahunMasukAkhir - tahunSekarang;
+                let hargaEmasMasaDepan = hargaEmasSekarang * Math.pow(1 + kenaikanEmas, tahunTotal);
+                let totalGramEmas = totalBiaya / hargaEmasMasaDepan;
+                let tabunganPerBulan = totalGramEmas / (tahunTotal * 12);
+                
+                hasilHTML += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">`;
+                
+                // Card untuk Ringkasan Tabungan
+                hasilHTML += `<div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <h3 class="text-lg font-bold mb-3 text-blue-800">Ringkasan Tabungan</h3>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Total Biaya Pendidikan:</span>
+                                        <span class="font-medium">Rp ${totalBiaya.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Harga Emas Saat Ini:</span>
+                                        <span>Rp ${hargaEmasSekarang.toLocaleString('id-ID')}/gr</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Proyeksi Harga Emas (${tahunMasukAkhir}):</span>
+                                        <span>Rp ${hargaEmasMasaDepan.toLocaleString('id-ID')}/gr</span>
+                                    </div>
+                                    <div class="pt-2 mt-2 border-t border-blue-200"></div>
+                                    <div class="flex justify-between text-lg">
+                                        <span class="font-semibold">Total Emas Dibutuhkan:</span>
+                                        <span class="font-bold">${totalGramEmas.toFixed(2)} gram</span>
+                                    </div>
+                                    <div class="flex justify-between bg-blue-600 text-white p-3 rounded-lg text-lg">
+                                        <span class="font-semibold">Tabungan Per Bulan:</span>
+                                        <span class="font-bold">${tabunganPerBulan.toFixed(2)} gram</span>
+                                    </div>
+                                </div>
+                              </div>`;
+                
+                // Card untuk Grafik
+                hasilHTML += `<div class="bg-gray-50 p-4 rounded-lg border">
+                                <h3 class="text-lg font-bold mb-3">Proyeksi Biaya</h3>
+                                <div>
+                                    <canvas id="biayaChart" height="200"></canvas>
+                                </div>
+                              </div>`;
+                              
+                hasilHTML += `</div>`;
+                
+                // Sembunyikan loading dan tampilkan hasil
+                document.getElementById("loadingResults").classList.add("hidden");
+                document.getElementById("hasil").innerHTML = hasilHTML;
+                document.getElementById("hasil").classList.remove("hidden");
+                document.getElementById("resultActions").classList.remove("hidden");
+                
+                // Buat grafik
+                setTimeout(() => {
+                    renderChart(jenjang, biayaSekarang, biayaProyeksiList);
+                }, 100);
+            }, 800); // Delay 800ms untuk efek loading
+        }
+        
+        function renderChart(jenjang, biayaSekarang, biayaProyeksi) {
+            const ctx = document.getElementById('biayaChart').getContext('2d');
             
-            hasilHTML += `<h3 class='text-lg font-bold mt-4'>Tabungan Emas</h3>`;
-            hasilHTML += `<p>Total Biaya Pendidikan: Rp ${totalBiaya.toLocaleString()}</p>`;
-            hasilHTML += `<p>Harga Emas Saat S3: Rp ${hargaEmasMasaDepan.toLocaleString()}</p>`;
-            hasilHTML += `<p>Total Emas yang Dibutuhkan: ${totalGramEmas.toFixed(2)} gram</p>`;
-            hasilHTML += `<p>Tabungan Per Bulan: ${tabunganPerBulan.toFixed(2)} gram</p>`;
+            // Hapus chart sebelumnya jika ada
+            if (biayaChart) {
+                biayaChart.destroy();
+            }
             
-            document.getElementById("hasil").innerHTML = hasilHTML;
+            biayaChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: jenjang,
+                    datasets: [
+                        {
+                            label: 'Biaya Saat Ini',
+                            data: biayaSekarang,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Biaya Masa Depan',
+                            data: biayaProyeksi,
+                            backgroundColor: 'rgba(220, 38, 38, 0.5)',
+                            borderColor: 'rgba(220, 38, 38, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'Rp ' + (value / 1000000).toFixed(0) + ' jt';
+                                    }
+                                    return 'Rp ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function printResults() {
+            window.print();
+        }
+        
+        function downloadPDF() {
+            alert('Fitur simpan PDF sedang dalam pengembangan. Silakan gunakan fitur print dan simpan sebagai PDF.');
         }
     </script>
 </body>
