@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Tabungan Pendidikan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Simulasi Tabungan Pendidikan</h2>
+        <form id="simulasiForm" class="space-y-4">
+            <div>
+                <label class="block font-medium">Usia Anak Saat Ini (Tahun)</label>
+                <input type="number" id="usiaAnak" class="w-full p-2 border rounded" value="4" min="1" required>
+            </div>
+            <div>
+                <label class="block font-medium">Tahun Sekarang</label>
+                <input type="number" id="tahunSekarang" class="w-full p-2 border rounded" value="2025" required>
+            </div>
+            <div>
+                <label class="block font-medium">Harga Emas Saat Ini (IDR/gram)</label>
+                <input type="number" id="hargaEmas" class="w-full p-2 border rounded" value="1200000" required>
+            </div>
+            <div>
+                <button type="button" onclick="hitungSimulasi()" class="w-full bg-blue-500 text-white py-2 rounded">Hitung</button>
+            </div>
+        </form>
+        <div id="hasil" class="mt-6"></div>
+    </div>
+
+    <script>
+        function hitungSimulasi() {
+            const usiaAnak = parseInt(document.getElementById("usiaAnak").value);
+            const tahunSekarang = parseInt(document.getElementById("tahunSekarang").value);
+            const hargaEmasSekarang = parseFloat(document.getElementById("hargaEmas").value);
+            
+            const jenjang = ["Preschool", "TK", "SD", "SMP", "SMA", "Kuliah"];
+            const usiaMasuk = [4.5, 7, 9, 15, 18, 21];
+            const biayaSekarang = [15000000, 20000000, 30000000, 40000000, 50000000, 80000000];
+            const inflasiPendidikan = 0.10;
+            const kenaikanEmas = 0.10;
+            
+            let hasilHTML = `<h3 class='text-lg font-bold mb-2'>Hasil Simulasi</h3>`;
+            hasilHTML += `<table class='w-full border-collapse border border-gray-300'>`;
+            hasilHTML += `<tr class='bg-gray-200'><th class='border p-2'>Jenjang</th><th class='border p-2'>Tahun Masuk</th><th class='border p-2'>Biaya (IDR)</th></tr>`;
+            
+            let totalBiaya = 0;
+            let tahunMasukAkhir = 0;
+            
+            for (let i = 0; i < jenjang.length; i++) {
+                let tahunMasuk = tahunSekarang + (usiaMasuk[i] - usiaAnak);
+                let biayaProyeksi = biayaSekarang[i] * Math.pow(1 + inflasiPendidikan, tahunMasuk - tahunSekarang);
+                totalBiaya += biayaProyeksi;
+                tahunMasukAkhir = Math.max(tahunMasukAkhir, tahunMasuk);
+                
+                hasilHTML += `<tr><td class='border p-2'>${jenjang[i]}</td><td class='border p-2'>${tahunMasuk}</td><td class='border p-2'>Rp ${biayaProyeksi.toLocaleString()}</td></tr>`;
+            }
+            hasilHTML += `</table>`;
+            
+            let hargaEmasMasaDepan = hargaEmasSekarang * Math.pow(1 + kenaikanEmas, tahunMasukAkhir - tahunSekarang);
+            let totalGramEmas = totalBiaya / hargaEmasMasaDepan;
+            let tabunganPerBulan = totalGramEmas / ((tahunMasukAkhir - tahunSekarang) * 12);
+            
+            hasilHTML += `<h3 class='text-lg font-bold mt-4'>Tabungan Emas</h3>`;
+            hasilHTML += `<p>Total Biaya Pendidikan: Rp ${totalBiaya.toLocaleString()}</p>`;
+            hasilHTML += `<p>Harga Emas Saat Kuliah: Rp ${hargaEmasMasaDepan.toLocaleString()}</p>`;
+            hasilHTML += `<p>Total Emas yang Dibutuhkan: ${totalGramEmas.toFixed(2)} gram</p>`;
+            hasilHTML += `<p>Tabungan Per Bulan: ${tabunganPerBulan.toFixed(2)} gram</p>`;
+            
+            document.getElementById("hasil").innerHTML = hasilHTML;
+        }
+    </script>
+</body>
+</html>
