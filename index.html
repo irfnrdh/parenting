@@ -23,6 +23,11 @@
                 <input type="number" id="hargaEmas" class="w-full p-2 border rounded" value="1200000" required>
             </div>
             <div>
+                <label class="block font-medium">Biaya Pendidikan Saat Ini per Jenjang (IDR)</label>
+                <input type="text" id="biayaPendidikan" class="w-full p-2 border rounded" value="15000000,20000000,30000000,40000000,50000000,80000000" required>
+                <small class="text-gray-500">Masukkan biaya untuk Preschool, TK, SD, SMP, SMA, Kuliah (pisahkan dengan koma).</small>
+            </div>
+            <div>
                 <button type="button" onclick="hitungSimulasi()" class="w-full bg-blue-500 text-white py-2 rounded">Hitung</button>
             </div>
         </form>
@@ -34,16 +39,17 @@
             const usiaAnak = parseInt(document.getElementById("usiaAnak").value);
             const tahunSekarang = parseInt(document.getElementById("tahunSekarang").value);
             const hargaEmasSekarang = parseFloat(document.getElementById("hargaEmas").value);
+            const biayaPendidikanInput = document.getElementById("biayaPendidikan").value;
+            const biayaSekarang = biayaPendidikanInput.split(",").map(Number);
             
             const jenjang = ["Preschool", "TK", "SD", "SMP", "SMA", "Kuliah"];
             const usiaMasuk = [4.5, 7, 9, 15, 18, 21];
-            const biayaSekarang = [15000000, 20000000, 30000000, 40000000, 50000000, 80000000];
             const inflasiPendidikan = 0.10;
             const kenaikanEmas = 0.10;
             
             let hasilHTML = `<h3 class='text-lg font-bold mb-2'>Hasil Simulasi</h3>`;
             hasilHTML += `<table class='w-full border-collapse border border-gray-300'>`;
-            hasilHTML += `<tr class='bg-gray-200'><th class='border p-2'>Jenjang</th><th class='border p-2'>Tahun Masuk</th><th class='border p-2'>Biaya (IDR)</th></tr>`;
+            hasilHTML += `<tr class='bg-gray-200'><th class='border p-2'>Jenjang</th><th class='border p-2'>Tahun Masuk</th><th class='border p-2'>Biaya Saat Ini (IDR)</th><th class='border p-2'>Biaya di Masa Depan (IDR)</th></tr>`;
             
             let totalBiaya = 0;
             let tahunMasukAkhir = 0;
@@ -54,7 +60,7 @@
                 totalBiaya += biayaProyeksi;
                 tahunMasukAkhir = Math.max(tahunMasukAkhir, tahunMasuk);
                 
-                hasilHTML += `<tr><td class='border p-2'>${jenjang[i]}</td><td class='border p-2'>${tahunMasuk}</td><td class='border p-2'>Rp ${biayaProyeksi.toLocaleString()}</td></tr>`;
+                hasilHTML += `<tr><td class='border p-2'>${jenjang[i]}</td><td class='border p-2'>${tahunMasuk}</td><td class='border p-2'>Rp ${biayaSekarang[i].toLocaleString()}</td><td class='border p-2'>Rp ${biayaProyeksi.toLocaleString()}</td></tr>`;
             }
             hasilHTML += `</table>`;
             
